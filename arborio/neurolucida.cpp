@@ -789,7 +789,6 @@ ARB_ARBORIO_API asc_morphology parse_asc_string(const char* input) {
     return {stree, std::move(morphology), std::move(labels)};
 }
 
-
 inline std::string read_file(std::string filename) {
     std::ifstream fid(filename);
 
