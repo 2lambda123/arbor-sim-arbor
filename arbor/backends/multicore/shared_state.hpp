@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include <iosfwd>
 #include <string>
 #include <unordered_map>
@@ -15,14 +14,12 @@
 #include <arbor/simd/simd.hpp>
 
 #include "fvm_layout.hpp"
-#include "timestep_range.hpp"
 
 #include "util/padded_alloc.hpp"
 #include "util/rangeutil.hpp"
 
 #include "threading/threading.hpp"
 
-#include "backends/event.hpp"
 #include "backends/common_types.hpp"
 #include "backends/rand_fwd.hpp"
 #include "backends/shared_state_base.hpp"
@@ -53,9 +50,14 @@ struct ARB_ARBOR_API ion_state {
 
     unsigned alignment = 1; // Alignment and padding multiple.
 
-    bool write_eX_;          // is eX written?
-    bool write_Xo_;          // is Xo written?
-    bool write_Xi_;          // is Xi written?
+    bool write_eX_:1;          // is eX written?
+    bool write_Xo_:1;          // is Xo written?
+    bool write_Xi_:1;          // is Xi written?
+    bool write_Xd_:1;          // is Xd written?
+    bool read_eX_:1;           // is eX read?
+    bool read_Xo_:1;           // is Xo read?
+    bool read_Xi_:1;           // is Xi read?
+    bool read_Xd_:1;           // is Xd read?
 
     iarray node_index_;     // Instance to CV map.
     array iX_;              // (A/m²)  current density
