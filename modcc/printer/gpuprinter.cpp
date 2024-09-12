@@ -1,7 +1,5 @@
-#include <cmath>
 #include <iostream>
 #include <string>
-#include <set>
 #include <regex>
 
 #include <fmt/core.h>
@@ -10,14 +8,12 @@
 
 #include "gpuprinter.hpp"
 #include "expression.hpp"
-#include "io/ostream_wrappers.hpp"
 #include "io/prefixbuf.hpp"
 #include "printer/cexpr_emit.hpp"
 #include "printer/printerutil.hpp"
 
 using io::indent;
 using io::popindent;
-using io::quote;
 
 static std::string scaled(double coeff) {
     std::stringstream ss;
@@ -221,7 +217,8 @@ ARB_LIBMODCC_API std::string emit_gpu_cu_source(const Module& module_, const pri
                                        "}}\n\n"),
                            pp_var_pfx);
     }
-    emit_api_kernel(state_api);
+    // TODO This needs additive?
+    emit_api_kernel(state_api, true);
     emit_api_kernel(current_api, true);
     emit_api_kernel(write_ions_api);
 
@@ -232,7 +229,8 @@ ARB_LIBMODCC_API std::string emit_gpu_cu_source(const Module& module_, const pri
                                        "                  const arb_deliverable_event_data* end_) {{\n"
                                        "    PPACK_IFACE_BLOCK;\n"
                                        "    const auto ii_ = threadIdx.x + blockDim.x*blockIdx.x;\n"
-                                       "    if (ii_ < (end_ - begin_)) {{\n"
+                                       "    auto n_ = end_ - begin_;\n"
+                                       "    if (ii_ < n_) {{\n"
                                        "        const auto tid_ = (begin_ + ii_)->mech_index;\n"
                                        "        if ((ii_ > 0) && ((begin_ + (ii_ - 1))->mech_index == tid_)) return;\n"
                                        "        for (auto i_ = begin_ + ii_; i_ < end_; ++i_) {{\n"
@@ -472,7 +470,6 @@ void emit_state_update_cu(std::ostream& out,
     auto var    = deref(d);
     auto use_weight = d.always_use_weight || !flags.is_point;
     std::string weight = scale + (use_weight ? pp_var_pfx + "weight[tid_]" : "1.0");
-
     if (d.additive && flags.use_additive) {
         out << name << " -= " << var << ";\n";
         if (flags.is_point) {

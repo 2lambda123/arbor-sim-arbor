@@ -1,3 +1,4 @@
+
 .. _tutorial:
 
 Tutorials
@@ -72,12 +73,13 @@ Hardware
    network_ring_gpu
 
 Advanced
--------
+--------
 
 .. toctree::
    :maxdepth: 1
 
    nmodl
+   full-feature-diffusion
 
 Demonstrations
 --------------
